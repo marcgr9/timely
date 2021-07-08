@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ $1 == "add" ]; then
+
+    if [ $# -eq 2 ] && [ -f "$2" ] && [ -x "$2" ]; then
+        mv "$2" "$2-real"
+        touch "$2"
+        echo "" > "$2"
+
+        path=`find $PWD -type f | grep "$2$"`
+        echo "$path"
+        
+        escapedPath=$(echo $path | sed 's_/_\\/_g')
+        sed "s/{FILE}/$escapedPath-real/" base_script > "$2"              
+
+        chmod +x "$2"
+    else
+        echo "usage: timely add [executable]"
+    fi
+fi
