@@ -12,9 +12,9 @@ echo $dialogText;
 if [ $dialogText == "ok" ]; then
     "{FILE}" & A=$!
     echo $A
-    sleep 90*60
+    sleep {TIME}*60
     
-    osascript -e 'display notification "Closing app in 2 minutes" with title "Timely"'
-    sleep 120
+    osascript -e 'display notification "Closing app in {EXTRA} minutes" with title "Timely"'
+    sleep {EXTRA}*60
     kill -n 1 $A
 fi
