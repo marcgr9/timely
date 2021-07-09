@@ -1,7 +1,50 @@
-#!/bin/sh
+#!/bin/bash
+
+time=-1
+extra_time=-1
+
+function load_config {
+    while read -r line
+    do
+        IFS=' '    
+        read -a kv <<< "$line"
+        
+        k="${kv[0]}"
+        v="${kv[1]}"
+        case "$k" in
+        time)
+            time="$v"
+            ;;
+        extra)
+            extra_time="$v"
+            ;;
+        *)
+            echo "unknown setting $k"
+            ;;
+        esac
+
+    done < "/Users/marc/projects/unix/timely/.preferences"
+}
+
+usage="usage: timely <add | remove | set> [executable | minutes]"
+
+if [ $# -lt 1 ]; then
+    echo "$usage"
+    exit
+fi
+
+load_config
+
+echo "configs: time=$time extra=$extra_time"
+
+if ! [[ "$time" =~ ^[0-9]+$ ]] || ! [[ "$extra_time" =~ ^[0-9]+$ ]] ||  [ "$time" -eq -1 ] || [ "$extra_time" -eq -1 ]; then
+    echo "aborting - bad config file"
+    exit
+fi
+
+echo "all good"
 
 if [ $1 == "add" ]; then
-
     if [ $# -eq 2 ] && [ -f "$2" ] && [ -x "$2" ]; then
         mv "$2" "$2-real"
         touch "$2"
@@ -11,10 +54,13 @@ if [ $1 == "add" ]; then
         echo "$path"
         
         escapedPath=$(echo $path | sed 's_/_\\/_g')
-        sed "s/{FILE}/$escapedPath-real/" base_script > "$2"              
+        cat base_script > "$2"        
+        echo `cat "$2" | sed "s/{FILE}/$escapedPath-real/" | sed "s/{TIME}/$time/" | sed "s/{EXTRA}/$extra_time/"` > "$2" 
 
         chmod +x "$2"
     else
-        echo "usage: timely add [executable]"
+        echo "$usage"
     fi
+else
+    echo "$usage"
 fi
