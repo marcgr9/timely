@@ -2,6 +2,7 @@
 
 time=-1
 extra_time=-1
+main_path=""
 
 function load_config {
     while read -r line
@@ -17,6 +18,9 @@ function load_config {
             ;;
         extra)
             extra_time="$v"
+            ;;
+        path)
+            main_path="$v"
             ;;
         *)
             echo "unknown setting $k"
@@ -45,19 +49,42 @@ fi
 echo "all good"
 
 if [ $1 == "add" ]; then
-    if [ $# -eq 2 ] && [ -f "$2" ] && [ -x "$2" ]; then
+    if [ $# -eq 2 ] && [ -f "$2" ] && [ -x "$2" ]; then       
+        path=`find $PWD -type f | grep "$2$"`
+        escapedPath=$(echo $path | sed 's_/_\\/_g')
+
+        if grep -q "$path" "$main_path/.timelies"; then
+            echo "Timely already exists"
+            exit
+        fi
+
         mv "$2" "$2-real"
         touch "$2"
         echo "" > "$2"
-
-        path=`find $PWD -type f | grep "$2$"`
-        echo "$path"
-        
-        escapedPath=$(echo $path | sed 's_/_\\/_g')
-        cat base_script > "$2"        
+ 
+        cat $main_path/base_script > "$2"        
         echo `cat "$2" | sed "s/{FILE}/$escapedPath-real/" | sed "s/{TIME}/$time/" | sed "s/{EXTRA}/$extra_time/"` > "$2" 
-
+        
+        echo "$path" >> $main_path/.timelies
+        
         chmod +x "$2"
+        echo "Created retsrictions for $(basename $2)"
+    else
+        echo "$usage"
+    fi
+
+elif [ $1 == "list" ]; then
+    cat "$main_path/.timelies"
+
+elif [ $1 == "remove" ]; then
+    if [ $# -eq 2 ]; then
+        if grep -q "^$2$" "$main_path/.timelies"; then
+            grep -v "^$2$" "$main_path/.timelies" > "$main_path/.temp"; mv "$main_path/.temp" "$main_path/.timelies"
+            
+            rm "$2"
+            mv "$2-real" "$2"
+            echo "Restrictions removed for $(basename $2)"
+         fi
     else
         echo "$usage"
     fi
