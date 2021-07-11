@@ -1,7 +1,7 @@
 #!/bin/sh
 
 read -r -d '' applescriptCode <<'EOF'
-   set dialogText to text returned of (display dialog "Terminating session in 90 minutes" default answer "")
+   set dialogText to text returned of (display dialog "Terminating session in {TIME} minutes" default answer "")
    return dialogText
 EOF
 
@@ -11,10 +11,10 @@ echo $dialogText;
 
 if [ $dialogText == "ok" ]; then
     "{FILE}" & A=$!
-    echo $A
-    sleep {TIME}*60
+    
+    sleep "$( expr {TIME} \* 60 )"
     
     osascript -e 'display notification "Closing app in {EXTRA} minutes" with title "Timely"'
-    sleep {EXTRA}*60
+    sleep "$( expr {EXTRA} \* 60)"
     kill -n 1 $A
 fi
