@@ -27,7 +27,7 @@ function load_config {
             ;;
         esac
 
-    done < "/Users/marc/projects/unix/timely/.preferences"
+    done < "/usr/local/etc/timely/.preferences"
 }
 
 usage="usage: timely <add | remove | set> [executable | minutes]"
@@ -42,14 +42,11 @@ fi
 
 load_config
 
-echo "configs: time=$time extra=$extra_time"
 
 if ! [[ "$time" =~ ^[0-9]+$ ]] || ! [[ "$extra_time" =~ ^[0-9]+$ ]] ||  [ "$time" -eq -1 ] || [ "$extra_time" -eq -1 ]; then
     echo "aborting - bad config file"
     exit
 fi
-
-echo "all good"
 
 if [ $1 == "add" ]; then
     if [ $# -eq 2 ] && [ -f "$2" ] && [ -x "$2" ]; then       
@@ -92,19 +89,6 @@ elif [ $1 == "remove" ]; then
     else
         echo "$usage"
     fi
-
-#elif [ $1 == "set" ]; then
-#    if [ $# -eq 3 ]; then
-#        if [ $2 == "time" ] || [ $2 == "extra" ] || [ $2 == "path" ]; then
-#            str="$2 $3"
-#            sed 
-#        else
-#            echo "usage: timely set [time | extra | path] value"
-#
-#    else
-#        echo "$usage"
-#    fi
-
 else
     echo "$usage"
 fi

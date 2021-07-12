@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "Removing existing data"
+rm -r "/usr/local/etc/timely"
+rm "/usr/local/bin/timely"
+
+echo "Creating config files"
+mkdir "/usr/local/etc/timely"
+touch "/usr/local/etc/timely/.preferences"
+touch "/usr/local/etc/timely/.timelies"
+cp "../base_script" "/usr/local/etc/timely"
+
+sed "s/{PATH}/\/usr\/local\/etc\/timely/" ../.preferences > "/usr/local/etc/timely/.preferences"
+
+echo "Creating executable"
+sudo cp "./../timely" "/usr/local/bin"
+
+echo "Installation completed"
