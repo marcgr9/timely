@@ -1,18 +1,21 @@
 #!/bin/sh
 
+path="/usr/local/etc/timely"
+escapedPath=$(echo '$path' | sed 's_/_\\/_g')
+
 echo "Removing existing data"
-rm -r "/usr/local/etc/timely"
+rm -r "$path"
 rm "/usr/local/bin/timely"
 
 echo "Creating config files"
-mkdir "/usr/local/etc/timely"
-touch "/usr/local/etc/timely/.preferences"
-touch "/usr/local/etc/timely/.timelies"
-cp "../base_script" "/usr/local/etc/timely"
+mkdir "$path"
+touch "$path/.preferences"
+touch "$path/.timelies"
+cp "../base_script" "$path"
 
-sed "s/{PATH}/\/usr\/local\/etc\/timely/" ../.preferences > "/usr/local/etc/timely/.preferences"
+sed "s/{PATH}/$escapedPath/" ../.preferences > "$path/.preferences"
 
 echo "Creating executable"
-sudo cp "./../timely" "/usr/local/bin"
+cp "./../timely" "/usr/local/bin"
 
 echo "Installation completed"
