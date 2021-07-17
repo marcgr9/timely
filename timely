@@ -31,8 +31,8 @@ function load_config {
 }
 
 usage="usage: timely <add | remove | set> [executable | minutes]"
-usage_add="usage: timely add [executable path]"
-usage_remove="usage: timely remove [executable full path]"
+usage_add="usage: timely add [executable]"
+usage_remove="usage: timely remove [full path to executable]"
 usage_list="usage: timely list"
 
 if [ $# -lt 1 ]; then
@@ -70,7 +70,7 @@ if [ $1 == "add" ]; then
         chmod +x "$2"
         echo "Created retsrictions for $(basename $2)"
     else
-        echo "$usage"
+        echo "$usage_add"
     fi
 
 elif [ $1 == "list" ]; then
@@ -87,8 +87,20 @@ elif [ $1 == "remove" ]; then
             echo "Restrictions removed for $(basename $2)"
          fi
     else
-        echo "$usage"
+        echo "$usage_remove"
     fi
+elif [ $1 == "set" ]; then
+    if [ $# -eq 3 ]; then
+        if grep -q "^$2 " "$main_path/.preferences"; then
+            echo `sed "/^$2 /d" "$main_path/.preferences"` > "$main_path/.preferences"
+            echo "$2 $3" >> "$main_path/.preferences"
+            echo "$1 updated to $2"
+        else
+            echo "That's not an existing setting"
+        fi
+    fi
+elif [ $1 == "preferences" ]; then 
+    cat "$main_path/.preferences"
 else
     echo "$usage"
 fi
