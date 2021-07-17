@@ -1,11 +1,11 @@
 #!/bin/sh
 
 path="/usr/local/etc/timely"
-escapedPath=$(echo '$path' | sed 's_/_\\/_g')
+escapedPath=$(echo "$path" | sed 's_/_\\/_g')
 
 echo "Removing existing data"
-rm -r "$path"
-rm "/usr/local/bin/timely"
+rm -r "$path" 2> /dev/null
+rm "/usr/local/bin/timely" 2> /dev/null
 
 echo "Creating config files"
 mkdir "$path"
