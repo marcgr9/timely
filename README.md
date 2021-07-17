@@ -19,6 +19,8 @@ it should install all the necessary files in ```/usr/local/etc/timely```
 ```timely remove [full path to executable]``` - removes all restrictions for the given app
 
 ```timely list``` - get full path of all restricted apps
+
+```timely set {time | extra} [value]``` - change preferences
       
 # config
 
@@ -33,7 +35,7 @@ config file is ```/usr/local/etc/timely/.preferences```
 
 # todo
 
-- [ ] ```timely set (time | extra) value``` - change settings by commands
+- [x] ```timely set (time | extra) value``` - change settings by commands
 - [ ] keep a list of currently running timelies
 - [ ] check the time remaining of a particular timely
 - [ ] gui ??? maybe not
