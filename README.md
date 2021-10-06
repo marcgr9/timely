@@ -21,6 +21,8 @@ it should install all the necessary files in ```/usr/local/etc/timely```
 ```timely list``` - get full path of all restricted apps
 
 ```timely set {time | extra} [value]``` - change preferences
+
+```timely preferences``` - view current config values
       
 # config
 
@@ -41,4 +43,4 @@ config file is ```/usr/local/etc/timely/.preferences```
 - [ ] gui ??? maybe not
 
 # bugs
-1. adding an executable by providing a full path usually doesn't work
+1. ~~adding an executable by providing a full path usually doesn't work~~
