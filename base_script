@@ -1,11 +1,11 @@
 #!/bin/sh
 
-read -r -d '' applescriptCode <<'EOF'
-   set dialogText to text returned of (display dialog "Terminating session in {TIME} minutes" default answer "")
+read -r -d '' launchApp <<'EOF'
+   set dialogText to text returned of (display dialog "Terminating session in {TIME} minutes, type \"ok\" to launch app" default answer "")
    return dialogText
 EOF
 
-dialogText=$(osascript -e "$applescriptCode");
+dialogText=$(osascript -e "$launchApp");
 
 echo $dialogText;
 
