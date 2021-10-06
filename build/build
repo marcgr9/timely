@@ -3,6 +3,11 @@
 path="/usr/local/etc/timely"
 escapedPath=$(echo "$path" | sed 's_/_\\/_g')
 
+if [ ! -f "$PWD/build" ]; then
+    echo "This script should be ran from /build"
+    exit 1
+fi
+
 echo "Removing existing data"
 rm -r "$path" 2> /dev/null
 rm "/usr/local/bin/timely" 2> /dev/null
