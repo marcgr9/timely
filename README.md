@@ -1,6 +1,6 @@
 # timely
 
-unix/mac command line utility to limit the amount of time an executable can be kept open
+mac command line utility to limit the amount of time an executable can be kept open. it's mac-only just because of the alerts that use applescript
 
 main idea is that after x minutes of working on something your productivity decreases a lot if you don't take a break
 
@@ -10,7 +10,7 @@ this utility automatically closes any application after the amount of time you s
 # build
 give exec permission to ```build/build``` and run it
 
-it should install all the necessary files in ```/usr/local/etc/timely```
+it will install all the necessary config in ```/usr/local/etc/timely``` and the executable in ```/usr/local/bin/timely```
 
 
 # usage
@@ -31,9 +31,6 @@ config file is ```/usr/local/etc/timely/.preferences```
 * time - the amount of minutes the app will be kept open
 
 * extra - the amount of minutes the app will be kept open after you were notified that it'll close soon
-
-* path - path to config folder
-
 
 # todo
 

@@ -1,0 +1,87 @@
+#!/bin/bash
+
+if [ ! -f "$PWD/test" ]; then
+    echo "You can execute the tests just from /test"
+    exit 1
+fi
+
+./setup
+
+# I really need to get me a testing library..
+
+../timely -t add executable > /dev/null
+if ! [ `wc -l "$PWD/res/.timelies" | awk '{print $1}'` -eq 1 ]; then
+    echo "Test #1 failed";
+fi
+if ! [ `./executable-real` == 'Running' ]; then
+    echo "Test #2 failed"
+fi
+if ! [ -x ./executable ]; then
+    echo "Test #3 failed"
+fi
+
+../timely -t add executable > /dev/null
+if ! [ `wc -l "$PWD/res/.timelies" | awk '{print $1}'` -eq 1 ]; then
+    echo "Test #4 failed";
+fi
+
+../timely -t add non-executable > /dev/null
+if ! [ `wc -l "$PWD/res/.timelies" | awk '{print $1}'` -eq 1 ]; then
+    echo "Test #5 failed";
+fi
+if [ -f ./non-executable-real ]; then
+    echo "Test #6 failed"
+fi
+if [ -x ./non-executable ]; then
+    echo "Test #7 failed"
+fi
+
+
+../timely -t remove `cat "$PWD/res/.timelies"` > /dev/null
+if ! [ `wc -l "$PWD/res/.timelies" | awk '{print $1}'` -eq 0 ]; then
+    echo "Test #8 failed";
+fi
+if ! [ `./executable` == 'Running' ]; then
+    echo "Test #9 failed"
+fi
+if ! [ `wc -l "./executable" | awk '{print $1}'` -eq 3 ]; then
+    echo "Test #10 failed";
+fi
+if [ -x ./executable-real ] || [ -f ./executable-real ]; then
+    echo "Test #11 failed"
+fi
+
+../timely -t set time 100 > /dev/null
+../timely -t add executable > /dev/null
+if ! grep --quiet ./executable -e 'expr 100' || ! grep --quiet ./executable -e 'expr 1'; then 
+    echo "Test #12 failed"
+fi
+
+../timely -t set extra 50 > /dev/null
+if ! grep --quiet ./executable -e 'expr 100' || ! grep --quiet ./executable -e 'expr 1'; then 
+    echo "Test #13 failed"
+fi
+
+../timely -t remove `cat "$PWD/res/.timelies"` > /dev/null
+../timely -t add executable > /dev/null
+
+if ! grep --quiet ./executable -e 'expr 100' || ! grep --quiet ./executable -e 'expr 50'; then 
+    echo "Test #14 failed"
+fi
+../timely -t set time 1 > /dev/null
+../timely -t set extra 0 > /dev/null
+../timely -t remove `cat "$PWD/res/.timelies"` > /dev/null
+../timely -t add executable > /dev/null
+echo "sleep 100" >> ./executable-real
+
+function check() {
+    sleep 65
+    pid=`ps -a | grep "^$!" | awk '{print $1}'`
+    if ! [ -z $pid ]; then
+        echo "Latest test failed, or you took more than 5 seconds to write 'ok'"
+    fi
+    ./cleanup
+    echo "Tests done"
+}
+
+./executable > /dev/null 2>&1 & check
