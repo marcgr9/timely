@@ -1,0 +1,17 @@
+#!/bin/bash
+
+./cleanup
+
+touch executable
+chmod +x executable
+cat << EOF >> executable
+#!/bin/bash
+
+echo "Running"
+EOF
+
+touch non-executable
+
+mkdir res
+cp ../base_script "$PWD/res/base_script"
+cd res && cp ../../.preferences .preferences && touch .timelies

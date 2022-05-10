@@ -1,8 +1,25 @@
 #!/bin/bash
 
+resources_path="/usr/local/etc/timely"
 time=-1
 extra_time=-1
-main_path=""
+
+testing=0
+
+# maybeee some checkings to make sure the user can't use -t would be nice
+while getopts ":t" o; do
+    case "${o}" in
+        t)
+            testing=1
+            ;;
+    esac
+done
+if [ $testing -eq 1 ]; then
+    shift
+    resources_path="$PWD/res"
+fi
+
+# $1 - add
 
 function load_config {
     while read -r line
@@ -13,21 +30,18 @@ function load_config {
         k="${kv[0]}"
         v="${kv[1]}"
         case "$k" in
-        time)
-            time="$v"
-            ;;
-        extra)
-            extra_time="$v"
-            ;;
-        path)
-            main_path="$v"
-            ;;
-        *)
-            echo "unknown setting $k"
-            ;;
+            time)
+                time="$v"
+                ;;
+            extra)
+                extra_time="$v"
+                ;;
+            *)
+                echo "unknown setting $k"
+                ;;
         esac
 
-    done < "/usr/local/etc/timely/.preferences"
+    done < "$resources_path/.preferences"
 }
 
 usage="usage: timely <add | remove | set | preferences> [executable | minutes]"
@@ -54,7 +68,7 @@ if [ $1 == "add" ]; then
         # path=`find $PWD -type f | grep "\/$2$"`
         escapedPath=$(echo $path | sed 's_/_\\/_g')
 
-        if grep -q "$path" "$main_path/.timelies"; then
+        if grep -q "$path" "$resources_path/.timelies"; then
             echo "Timely already exists"
             exit 1
         fi
@@ -63,10 +77,10 @@ if [ $1 == "add" ]; then
         touch "$2"
         echo "" > "$2"
  
-        cat $main_path/base_script > "$2"        
+        cat $resources_path/base_script > "$2"        
         echo `cat "$2" | sed "s/{FILE}/$escapedPath-real/" | sed "s/{TIME}/$time/" | sed "s/{EXTRA}/$extra_time/"` > "$2" 
         
-        echo "$path" >> $main_path/.timelies
+        echo "$path" >> $resources_path/.timelies
         
         chmod +x "$2"
         echo "Created retsrictions for $(basename $2)"
@@ -75,13 +89,13 @@ if [ $1 == "add" ]; then
     fi
 
 elif [ $1 == "list" ]; then
-    echo "You have `wc -l "$main_path/.timelies" | awk '{print $1}'` timelies"
-    cat "$main_path/.timelies"
+    echo "You have `wc -l "$resources_path/.timelies" | awk '{print $1}'` timelies"
+    cat "$resources_path/.timelies"
 
 elif [ $1 == "remove" ]; then
     if [ $# -eq 2 ]; then
-        if grep -q "^$2$" "$main_path/.timelies"; then
-            grep -v "^$2$" "$main_path/.timelies" > "$main_path/.temp"; mv "$main_path/.temp" "$main_path/.timelies"
+        if grep -q "^$2$" "$resources_path/.timelies"; then
+            grep -v "^$2$" "$resources_path/.timelies" > "$resources_path/.temp"; mv "$resources_path/.temp" "$resources_path/.timelies"
             
             rm "$2"
             mv "$2-real" "$2"
@@ -94,16 +108,16 @@ elif [ $1 == "remove" ]; then
     fi
 elif [ $1 == "set" ]; then
     if [ $# -eq 3 ]; then
-        if grep -q "^$2 " "$main_path/.preferences"; then
-            echo `sed "/^$2 /d" "$main_path/.preferences"` > "$main_path/.preferences"
-            echo "$2 $3" >> "$main_path/.preferences"
-            echo "$1 updated to $2"
+        if grep -q "^$2 " "$resources_path/.preferences"; then
+            echo `sed "/^$2 /d" "$resources_path/.preferences"` > "$resources_path/.preferences"
+            echo "$2 $3" >> "$resources_path/.preferences"
+            echo "$2 updated to $3"
         else
             echo "That's not an existing setting"
         fi
     fi
 elif [ $1 == "preferences" ]; then 
-    cat "$main_path/.preferences"
+    cat "$resources_path/.preferences"
 else
     echo "$usage"
 fi
